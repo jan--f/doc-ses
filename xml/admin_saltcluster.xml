@@ -177,17 +177,9 @@
   <para>
    To remove a role from a cluster, edit
    <filename>/srv/pillar/ceph/proposals/policy.cfg</filename> and remove the
-   corresponding line(s).
-  </para>
-
-  <para>
-   If you are removing roles only, run Stages 2 and 5 as described in
-   <xref linkend="ceph.install.stack"/>.
-  </para>
-
-  <para>
-   If you are removing <emphasis>and</emphasis> adding roles at the same time,
-   run Stages 2 to 5 as described in <xref linkend="ceph.install.stack"/>.
+   corresponding line(s). Then run Stages 2 and 5 as described in
+   <xref
+    linkend="ceph.install.stack"/>.
   </para>
 
   <note>
@@ -291,8 +283,54 @@ role-rgw/cluster/rgw1*.sls</screen>
    </para>
   </example>
  </sect1>
+ <sect1 xml:id="ds.mon">
+  <title>Redeploying Monitor Nodes</title>
+
+  <para>
+   When one or more of your monitor nodes fail and are not responding, you need
+   to remove the failed monitors from the cluster and then re-add them back in
+   the cluster:
+  </para>
+
+  <procedure>
+   <step>
+    <para>
+     Edit <filename>/srv/pillar/ceph/proposals/policy.cfg</filename> on the
+     &smaster;, remove the lines that correspond to the failed monitor nodes,
+     and add the lines that correspond to the newly added monitor nodes.
+    </para>
+   </step>
+   <step>
+    <para>
+     Remove keys belonging to the &sminion;s with failed monitor nodes:
+    </para>
+<screen>
+&prompt.smaster;salt-key -d <replaceable>mon1</replaceable>, <replaceable>mon2</replaceable>, ...
+</screen>
+   </step>
+   <step>
+    <para>
+     Register new &sminion;s keys:
+    </para>
+<screen>
+&prompt.smaster;salt-key -a <replaceable>mon1</replaceable>, <replaceable>mon2</replaceable>, ...
+</screen>
+   </step>
+   <step>
+    <para>
+     Run &deepsea; Stages 2 to 5 to apply the changes:
+    </para>
+<screen>
+&prompt.smaster;<command>deepsea</command> stage run ceph.stage.2
+&prompt.smaster;<command>deepsea</command> stage run ceph.stage.3
+&prompt.smaster;<command>deepsea</command> stage run ceph.stage.4
+&prompt.smaster;<command>deepsea</command> stage run ceph.stage.5
+</screen>
+   </step>
+  </procedure>
+ </sect1>
  <sect1 xml:id="salt.node.add-disk">
-  <title>Add OSD to Node</title>
+  <title>Add an OSD to a Node</title>
 
   <para>
    To add a disk to an existing OSD node, verify that any partition on the disk
@@ -321,7 +359,7 @@ role-rgw/cluster/rgw1*.sls</screen>
   </tip>
  </sect1>
  <sect1 xml:id="salt.removing.osd">
-  <title>Removing OSD</title>
+  <title>Removing an OSD</title>
 
   <para>
    A &osd; can be removed from the cluster by running the following command:
