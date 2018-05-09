@@ -288,33 +288,62 @@ role-rgw/cluster/rgw1*.sls</screen>
 
   <para>
    When one or more of your monitor nodes fail and are not responding, you need
-   to remove the failed monitors from the cluster and then re-add them back in
-   the cluster:
+   to remove the failed monitors from the cluster and possibly then re-add them
+   back in the cluster.
   </para>
+
+  <important>
+   <title>The Minimum is Three Monitor Nodes</title>
+   <para>
+    The number of monitor nodes must not be less than three. If a monitor node
+    fails, and as a result your cluster has only one or two monitor nodes, you
+    need to temporarily assign the monitor role to other cluster nodes before
+    you redeploy the failed monitor nodes. After you redeploy the failed
+    monitor nodes, you can uninstall the temporary monitor roles.
+   </para>
+   <para>
+    For more information on adding new nodes/roles to the &ceph; cluster, see
+    <xref linkend="salt.adding.nodes"/> and
+    <xref
+     linkend="salt.adding.services"/>.
+   </para>
+   <para>
+    For more information on removing cluster nodes, refer to
+    <xref
+     linkend="salt.node.removing"/>.
+   </para>
+  </important>
+
+  <para>
+   There are two basic degrees of a &ceph; node failure:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     The &sminion; host is broken either physically or on the OS level, and
+     does not respond to the <command>salt
+     '<replaceable>minion_name</replaceable>' test.ping</command> call. In such
+     case you need to redeploy the server completely by following the relevant
+     instructions in <xref linkend="ceph.install.stack"/>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The monitor related services failed and refuse to recover, but the host
+     responds to the <command>salt '<replaceable>minion_name</replaceable>'
+     test.ping</command> call. In such case, follow these steps:
+    </para>
+   </listitem>
+  </itemizedlist>
 
   <procedure>
    <step>
     <para>
      Edit <filename>/srv/pillar/ceph/proposals/policy.cfg</filename> on the
-     &smaster;, remove the lines that correspond to the failed monitor nodes,
-     and add the lines that correspond to the newly added monitor nodes.
+     &smaster;, and remove or update the lines that correspond to the failed
+     monitor nodes so that they now point to the working monitor nodes.
     </para>
-   </step>
-   <step>
-    <para>
-     Remove keys belonging to the &sminion;s with failed monitor nodes:
-    </para>
-<screen>
-&prompt.smaster;salt-key -d <replaceable>mon1</replaceable>, <replaceable>mon2</replaceable>, ...
-</screen>
-   </step>
-   <step>
-    <para>
-     Register new &sminion;s keys:
-    </para>
-<screen>
-&prompt.smaster;salt-key -a <replaceable>mon1</replaceable>, <replaceable>mon2</replaceable>, ...
-</screen>
    </step>
    <step>
     <para>
