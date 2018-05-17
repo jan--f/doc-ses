@@ -1232,15 +1232,13 @@ profile-default/stack/default/ceph/minions/*.yml</screen>
           linkend="storage.salt.cluster"/>.
         </para>
        </listitem>
-       <itemizedlist>
-        <listitem>
-         <para>
-          When upgrading from &productname; 4 and converting OSDs from
-          &filestore; to &bluestore;. The general upgrade procedures are
-          described in <xref linkend="ceph.install.stack"/>.
-         </para>
-        </listitem>
-       </itemizedlist>
+       <listitem>
+        <para>
+         When upgrading from &productname; 4 and converting OSDs from
+         &filestore; to &bluestore;. The general upgrade procedures are
+         described in <xref linkend="ceph.install.stack"/>.
+        </para>
+       </listitem>
       </itemizedlist>
      </tip>
      <important>
